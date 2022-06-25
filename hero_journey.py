@@ -2,7 +2,7 @@
 
 
 
-from math import comb
+from email.base64mime import header_length
 from os import sep, system
 from random import randint, random
 from time import sleep
@@ -34,6 +34,7 @@ class Hero():
     def train(self):
         keep_figthing = True
         while keep_figthing == True:
+            # We get a minion name from the minion list and create it to fight the hero.
             minion = spawnminion(self.attack,self.defense, self.speed, self.critchance, self.maxhealth)
             #####################
             # Battle logic here #
@@ -43,9 +44,12 @@ class Hero():
             combat = True
             while combat == True:
                 try:
-                    decision = int(input('It\'s your turn {hero} what do you want to do?\n1. Attack\n2. Use potion\n'.format(hero = self.name)))
+                    print(f'{"HP:":7}  {"{health}/{maxhealth}"}'.format(health = self.health, maxhealth = self.maxhealth))
+                    print(f'{"Potions:":7}  {"{potions}"}'.format(potions = self.potions))
+                    decision = int(input('\nIt\'s your turn {hero} what do you want to do?\n1. Attack\n2. Use potion\n'.format(hero = self.name)))
                     match decision:
                         case 1:
+                            # If the player chooses 1 then we start the combat logic.
                             combat = self.attack_enemy(minion)
                             if combat == True:
                                 print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
@@ -67,7 +71,7 @@ class Hero():
                                     print ("You leveled up sir {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\nYou have recovered 3 health points and have 5 more maximum health points.".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
                                     
                         case 2: 
-                            ################ Create method to use potions ######################
+                            # If the player choose to use a potion we call the use_potion method.
                             potion_was_used = self.use_potion() 
                             if not potion_was_used: continue
                         case _:
@@ -79,7 +83,7 @@ class Hero():
             keep_figthing = False
             while True:
                 try:
-                    decision = int(input('You have {health} health points remaining, do you wish to continue training or you want to go back to the village?\n1. Continue training\n2. Go back.'.format(health = self.health)))
+                    decision = int(input('You have {health}/{maxhealth} HP remaining, do you wish to continue training or you want to go back to the village?\n1. Continue training\n2. Go back.'.format(health = self.health, maxhealth = self.maxhealth)))
                     match decision:
                         case 1:
                             keep_figthing = True
@@ -87,6 +91,8 @@ class Hero():
                         case 2:
                             keep_figthing = False
                             print("Gotcha!, going back to the village now.")
+                            sleep(1.5)
+                            clear
                             break
                         case _:
                             print("Please type only 1 or 2 on your keyboard to choose an option.")
@@ -94,7 +100,27 @@ class Hero():
                 except ValueError: 
                     print("Sorry we didn't get that please try again.")
             
-            
+    def use_potion(self):
+        # Uses a potion on the hero to recover 20% of his health. (If he has potions left.)
+        if self.potions > 0:
+            while True:
+                # If the hero is at it's current maximum HP inform him about it and don't make him lose his turn
+                if self.health == self.maxhealth:
+                    print('You already have all your HP {name}'.format(name = self.name))
+                    return False
+                else:
+                # If we get here we give the potion to the hero and reduce the amount of potions that he has by 1
+                    self.gainhealth()
+                    self.potions -= 1
+                    return True
+                    break
+        else: print('You don\'t have any potions left.'); return False
+
+    def gainhealth(self):
+        self.health += round(self.maxhealth * 0.2)
+        if self.health > self.maxhealth:
+            self.health = self.maxhealth
+        print('You used a potion and have now {health}/{maxhealth} HP'.format(health = self.health, maxhealth = self.maxhealth))
     
     def attack_enemy(self, enemy):
         dodge = enemy.dodge()
@@ -122,7 +148,7 @@ class Hero():
             self.money -= round(self.money * 0.25)
             return False
         else:
-            print ("You have taken {damage} damage points, you have {health} points remaining".format(damage = damage, health = self.health))
+            print ("You have taken {damage} damage points, you have {health}/{maxhealth} points remaining".format(damage = damage, health = self.health, maxhealth = self.maxhealth))
             return True
 
         
@@ -149,7 +175,7 @@ class Minion():
             print("You have defeated {enemy}!".format(enemy = self.name))
             return False
         else:
-            print ("{enemy} has taken {damage} damage points, it has {health} points remaining".format(enemy = self.name, damage = damage, health = self.health))
+            print ("{enemy} has taken {damage} damage points, it has {health}/{maxhealth} HP remaining".format(enemy = self.name, damage = damage, health = self.health, maxhealth = self.maxhealth))
             return True
     def crit(self):
         if (random()*100 < self.critchance * 5):
