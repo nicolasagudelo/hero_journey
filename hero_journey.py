@@ -2,7 +2,6 @@
 
 
 
-from email.base64mime import header_length
 from os import sep, system
 from random import randint, random
 from time import sleep
@@ -91,7 +90,7 @@ class Hero():
                         case 2:
                             keep_figthing = False
                             print("Gotcha!, going back to the village now.")
-                            sleep(1.5)
+                            sleep(1)
                             clear
                             break
                         case _:
@@ -104,7 +103,7 @@ class Hero():
         # Uses a potion on the hero to recover 20% of his health. (If he has potions left.)
         if self.potions > 0:
             while True:
-                # If the hero is at it's current maximum HP inform him about it and don't make him lose his turn
+                # If the hero is at it's current maximum HP inform him about it.
                 if self.health == self.maxhealth:
                     print('You already have all your HP {name}'.format(name = self.name))
                     return False
@@ -125,7 +124,7 @@ class Hero():
     def attack_enemy(self, enemy):
         dodge = enemy.dodge()
         if dodge:
-            print("{enemy} is too fast!, he dodged your attack.".format(enemy = enemy.name))
+            print("\n{enemy} is too fast!, he dodged your attack.".format(enemy = enemy.name))
             return True
         else:
             crit = self.crit()
@@ -148,7 +147,7 @@ class Hero():
             self.money -= round(self.money * 0.25)
             return False
         else:
-            print ("You have taken {damage} damage points, you have {health}/{maxhealth} points remaining".format(damage = damage, health = self.health, maxhealth = self.maxhealth))
+            print ("\nYou have taken {damage} damage points, you have {health}/{maxhealth} points remaining\n".format(damage = damage, health = self.health, maxhealth = self.maxhealth))
             return True
 
         
@@ -172,10 +171,10 @@ class Minion():
         self.health -= damage
         if self.health <= 0:
             self.health = 0
-            print("You have defeated {enemy}!".format(enemy = self.name))
+            print("\nYou have defeated {enemy}!\n".format(enemy = self.name))
             return False
         else:
-            print ("{enemy} has taken {damage} damage points, it has {health}/{maxhealth} HP remaining".format(enemy = self.name, damage = damage, health = self.health, maxhealth = self.maxhealth))
+            print ("\n{enemy} has taken {damage} damage points, it has {health}/{maxhealth} HP remaining\n".format(enemy = self.name, damage = damage, health = self.health, maxhealth = self.maxhealth))
             return True
     def crit(self):
         if (random()*100 < self.critchance * 5):
@@ -218,7 +217,6 @@ def main():
             match decision:
                 case 1:
                     hero.train()
-                    input()
                 case 2:
                     pass
                 case 3:
