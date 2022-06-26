@@ -1,8 +1,7 @@
 #Author: Nicolas Agudelo.
 
 
-
-from os import sep, system
+from os import system
 from random import randint, random
 from time import sleep
 
@@ -56,18 +55,21 @@ class Hero():
                             else:
                                 self.exp += 5
                                 self.money += randint(1,3)
-                                print ("You got {money}$ now.".format(money = self.money))
-                                if (random()*100 < 20):
+                                print ("You got {money}$ now.\n".format(money = self.money))
+                                if (random()*100 < 20 and self.potions < 10):
                                         random_potions = randint (1, 2)
-                                        print("What's that? It seems like the monster was carrying some potions.\nYou got {potions} more potion(s)".format(potions = random_potions))
+                                        print("What's that? It seems like the monster was carrying some potions.\n\nYou got {potions} more potion(s)".format(potions = random_potions))
                                         self.potions += random_potions
+                                        if self.potions > 10: 
+                                            self.potions = 10
+                                            print("\n\nYou have got the maximum amount of potions you will have to leave some behind.\n")
                                 if self.exp >= 10:
                                     self.health += 3
                                     self.maxhealth += 5
                                     self.lvl += 1
                                     self.exp -= 10
                                     self.statpoints += 1
-                                    print ("You leveled up sir {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\nYou have recovered 3 health points and have 5 more maximum health points.".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
+                                    print ("\nYou leveled up sir {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\n\nYou have recovered 3 health points and have 5 more maximum health points.\n".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
                                     
                         case 2: 
                             # If the player choose to use a potion we call the use_potion method.
@@ -82,16 +84,17 @@ class Hero():
             keep_figthing = False
             while True:
                 try:
-                    decision = int(input('You have {health}/{maxhealth} HP remaining, do you wish to continue training or you want to go back to the village?\n1. Continue training\n2. Go back.'.format(health = self.health, maxhealth = self.maxhealth)))
+                    decision = int(input('You have {health}/{maxhealth} HP remaining and {potions} potions, do you wish to continue training or you want to go back to the village?\n1. Continue training\n2. Go back.\n'.format(health = self.health, maxhealth = self.maxhealth, potions = self.potions)))
                     match decision:
                         case 1:
                             keep_figthing = True
                             break
                         case 2:
                             keep_figthing = False
-                            print("Gotcha!, going back to the village now.")
+                            clear()
+                            print("Gotcha!, going back to the village now.", flush= True)
                             sleep(1)
-                            clear
+                            clear()
                             break
                         case _:
                             print("Please type only 1 or 2 on your keyboard to choose an option.")
@@ -133,6 +136,7 @@ class Hero():
     
     def crit(self):
         if (random()*100 < self.critchance * 5):
+            print("\nYou land a critical strike!\n")
             return 2
         return 1
     def dodge(self):
@@ -140,14 +144,17 @@ class Hero():
             return True
         return False
     def lose_health(self, damage):
+        print("\nYou take {damage} damage!\n".format(damage = damage))
         self.health -= damage
         if self.health <= 0:
             self.health = 0
-            print("You have been defeated!\n You will be transported back to the village and lose some money.")
+            print("\nYou have been defeated!\nYou will be transported back to the village and lose some money.")
             self.money -= round(self.money * 0.25)
+            sleep(1)
+            clear()
             return False
         else:
-            print ("\nYou have taken {damage} damage points, you have {health}/{maxhealth} points remaining\n".format(damage = damage, health = self.health, maxhealth = self.maxhealth))
+            print ("\nYou have {health}/{maxhealth} points remaining\n".format(health = self.health, maxhealth = self.maxhealth))
             return True
 
         
@@ -168,16 +175,18 @@ class Minion():
             return True
         return False
     def lose_health(self, damage):
+        print("\n{minion} takes {damage} damage!\n".format(minion = self.name, damage = damage))
         self.health -= damage
         if self.health <= 0:
             self.health = 0
             print("\nYou have defeated {enemy}!\n".format(enemy = self.name))
             return False
         else:
-            print ("\n{enemy} has taken {damage} damage points, it has {health}/{maxhealth} HP remaining\n".format(enemy = self.name, damage = damage, health = self.health, maxhealth = self.maxhealth))
+            print ("\n{enemy} has {health}/{maxhealth} HP remaining\n".format(enemy = self.name, health = self.health, maxhealth = self.maxhealth))
             return True
     def crit(self):
         if (random()*100 < self.critchance * 5):
+            print("\n{minion} lands a critical strike!\n".format(minion = self.name))
             return 2
         return 1
     def attack_hero(self, hero):
@@ -213,18 +222,55 @@ def main():
     while True:
         hero.health = hero.maxhealth
         try:
-            decision = int(input("Where do you want to go now Hero?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n"))
+            decision = int(input("Where do you want to go now Hero?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n5. Exit\n"))
             match decision:
                 case 1:
                     hero.train()
                 case 2:
-                    pass
+                    ############### Add Store where player can spend money on potions ###########
+                    store(hero)
+                    clear()
                 case 3:
+                    ############### Print the stat points of the Hero and allow him to assign the ones he have stored. ###################
                     pass
                 case 4:
+                    ################# Battle the Bosses of the game ##########################
                     pass
+                case 5:
+                    exit()
         except ValueError:
             print("That is not a valid option try again.")
+
+def store(hero):
+    while True:
+        clear()
+        print ("Welcome to the store {name} here you can buy potions for your adventures\n".format(name = hero.name))
+        print (f'{"Item:":6}    {"Price:"}')
+        print (f'{"Potion":6}    {"5$"}')
+        try:
+            potions_to_buy = int(input("\nYou have {potions} potions and {money}$, how many potions would you like to buy?\nWrite 0 if you want to go back to the village\n".format(potions = hero.potions, money = hero.money)))
+            # If the player writes 0 we take him back to the village
+            if potions_to_buy == 0:
+                print("\nWe hope to have you back soon!")
+                input("Press Enter to go back to the Village.\n")
+                break
+            # We set a maximum amount of potions so that the player can't just buy them infinitely
+            if potions_to_buy > 10: potions_to_buy = 10; print("\nYou can't carry more than 10 potions we will assume you want 10 potions\n")
+            # If the player set an amount that is going to go over 10 potions we max out his number of potions to 10 instead without making him pay extra money.
+            if hero.potions + potions_to_buy > 10: potions_to_buy = potions_to_buy - hero.potions; print("\nYou don't have space on your inventory for that amount of potions, we will max out your potions to 10.\n")
+            if (potions_to_buy * 5) > hero.money:
+                print("\nYou don't have enough money to buy that many potions, please select a lower number.\n")
+                input("Press Enter to go back to the Store.\n")
+                continue
+            else:
+                hero.potions += potions_to_buy
+                hero.money -= potions_to_buy * 5
+                print("\nThanks for your purchase! you now have {potions} potions\nCome back soon!".format(potions = hero.potions))
+                input("Press Enter to go back to the Village.\n")
+                break
+        except ValueError:
+            print("\nThe value you wrote is not valid, please try again.\n")
+            input("Press Enter to go back to the Store.\n")
 
 def create_player():
     print("""
