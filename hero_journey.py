@@ -24,10 +24,10 @@ class Hero():
         self.potions = 0        
     
     def __repr__(self):
-        print("I'm the Hero {name}.")
-        print("These are my current stats:\n\nLevel: {lvl}\nAttack: {attack}\nDefense: {defense}\nSpeed: {speed}\nCrit Chance: {critchance}\nExp: {exp}\n".format(lvl = self.lvl, attack = self.attack, defense = self.defense, speed = self.speed, critchance = self.critchance, exp = self.exp))
-        print("I have {potions} potions".format(potions = self.potions))
-        return ("\nI have {money} money".format(money = self.money))
+        print("You are the Hero {name}.".format(name = self.name))
+        print("These are your current stats:\n\nLevel: {lvl}\nAttack: {attack}\nDefense: {defense}\nSpeed: {speed}\nCrit Chance: {critchance}\nExp: {exp}\n".format(lvl = self.lvl, attack = self.attack, defense = self.defense, speed = self.speed, critchance = self.critchance, exp = self.exp))
+        print("You have {potions} potions".format(potions = self.potions))
+        return ("\nYou have {money} money\n".format(money = self.money))
 
     def train(self):
         keep_figthing = True
@@ -227,19 +227,173 @@ def main():
                 case 1:
                     hero.train()
                 case 2:
-                    ############### Add Store where player can spend money on potions ###########
                     store(hero)
                     clear()
                 case 3:
-                    ############### Print the stat points of the Hero and allow him to assign the ones he have stored. ###################
-                    pass
+                    stats(hero)
                 case 4:
                     ################# Battle the Bosses of the game ##########################
                     pass
                 case 5:
+                    print("Thanks for playing!")
+                    sleep(1)
+                    clear()
                     exit()
         except ValueError:
             print("That is not a valid option try again.")
+
+def stats(hero):
+    clear()
+    print(hero)
+    if hero.statpoints == 0:
+        print("\nYou don't have any statpoints to spend right now.\n")
+        input("Press Enter to return to the village.")
+        clear()
+    else:
+        while True:
+            try:
+                answer = input("You have {statpoints} statpoints available to use.\nDo you want to spend them now? Y/N\n".format(statpoints = hero.statpoints)).upper().strip()
+                match answer:
+                    case 'Y':
+                        assign_stats(hero)
+                        break
+                    case 'N':
+                        clear()
+                        break
+                    # In case they write anything else.
+                    case _: 
+                        print("Please type Y for yes, or, N for no. Other answers are not supported.") 
+                        continue
+            except ValueError:
+                print("\nWe didn't get that, please try again.")
+    
+def assign_stats(hero):
+    while True:
+        clear()
+        print(f'{"Stat Points":12}  ==>  {hero.statpoints:3d}')
+        print(f'{"Attack":12}  ==>  {hero.attack:3d}')
+        print(f'{"Defense":12}  ==>  {hero.defense:3d}')
+        print(f'{"Speed":12}  ==>  {hero.speed:3d}')
+        print(f'{"Crit. Chance":12}  ==>  {hero.critchance:3d}')
+        try:
+            attribute = int(input("Select the attribute you want to upgrade:\n1. Attack\n2. Defense\n3. Speed\n4. Crit Chance\n5. Go back to the Village\n"))
+            match attribute:
+                case 1:
+                    if hero.attack == 10:
+                        print("\nYou have already maxed out this stat, please choose another one.\n")
+                        input("\nPress Enter to continue\n")
+                        continue
+                    try:
+                        upgrade_stats = int(input("How many points do you want to spend increasing your attack stats?\n"))
+                        if upgrade_stats > hero.statpoints:
+                            print("\nYou don't have that many stat points please try again.\n")
+                            input("\nPress Enter to continue\n")
+                            continue
+                        increase_stats(upgrade_stats, attribute, hero)
+                    except ValueError:
+                        print("\nWe didn't get that, please try again.\n")
+                        input("\nPress Enter to continue\n")
+                case 2:
+                    if hero.defense == 10:
+                        print("\nYou have already maxed out this stat, please choose another one.\n")
+                        input("\nPress Enter to continue\n")
+                        continue
+                    try:
+                        upgrade_stats = int(input("How many points do you want to spend increasing your defense stats?\n"))
+                        if upgrade_stats > hero.statpoints:
+                            print("\nYou don't have that many stat points please try again.\n")
+                            input("\nPress Enter to continue\n")
+                            continue
+                        increase_stats(upgrade_stats, attribute, hero)
+                    except ValueError:
+                        print("\nWe didn't get that, please try again.\n")
+                        input("\nPress Enter to continue\n")
+                case 3:
+                    if hero.speed == 10:
+                        print("\nYou have already maxed out this stat, please choose another one.\n")
+                        input("\nPress Enter to continue\n")
+                        continue
+                    try:
+                        upgrade_stats = int(input("How many points do you want to spend increasing your speed stats?\n"))
+                        if upgrade_stats > hero.statpoints:
+                            print("\nYou don't have that many stat points please try again.\n")
+                            input("\nPress Enter to continue\n")
+                            continue
+                        increase_stats(upgrade_stats, attribute, hero)
+                    except ValueError:
+                        print("\nWe didn't get that, please try again.\n")
+                        input("\nPress Enter to continue\n")
+                case 4:
+                    if hero.critchance == 10:
+                        print("You have already maxed out this stat, please choose another one.")
+                        input("\nPress Enter to continue\n")
+                        continue
+                    try:
+                        upgrade_stats = int(input("How many points do you want to spend increasing your crit chance stats?\n"))
+                        if upgrade_stats > hero.statpoints:
+                            print("\nYou don't have that many stat points please try again.\n")
+                            input("\nPress Enter to continue\n")
+                            continue
+                        increase_stats(upgrade_stats, attribute, hero)
+                    except ValueError:
+                        print("\nWe didn't get that, please try again.\n")
+                        input("\nPress Enter to continue\n")
+                case 5:
+                    print("Going back to the Village!",flush=True)
+                    sleep(1.5)
+                    clear()
+                    break
+                case _:
+                    print("\nNot a valid option, please try again.\n")
+                    input("\nPress Enter to continue\n")
+                    continue
+            
+        except ValueError:
+            print("\nWe didn't get that, please try again.")
+            input("\nPress Enter to continue\n")
+
+def increase_stats(points, attribute,hero):
+    match attribute:
+        case 1:
+            attack_before = hero.attack
+            hero.attack += points
+            if hero.attack > 10: 
+                hero.attack = 10
+                print("\nYou have maxed out this stat! We'll leave it at 10 and return any unused points.\n")
+                input("\nPress Enter to continue\n")
+            hero.statpoints -= (hero.attack - attack_before)
+            print("\nDone!\n")
+            input("\nPress Enter to continue\n")
+        case 2:
+            def_before = hero.defense
+            hero.defense += points
+            if hero.defense > 10: 
+                hero.defense = 10
+                print("\nYou have maxed out this stat! We'll leave it at 10 and return any unused points.\n")
+                input("\nPress Enter to continue\n")
+            hero.statpoints -= (hero.defense - def_before)
+            print("\nDone!\n")
+            input("\nPress Enter to continue\n")
+        case 3:
+            speed_before = hero.speed
+            hero.speed += points
+            if hero.speed > 10: 
+                hero.speed = 10
+                print("\nYou have maxed out this stat! We'll leave it at 10 and return any unused points.\n")
+                input("\nPress Enter to continue\n")
+            hero.statpoints -= (hero.speed - speed_before)
+            print("\nDone!\n")
+            input("\nPress Enter to continue\n")
+        case 4:
+            crit_before = hero.critchance
+            hero.critchance += points
+            if hero.critchance > 10: 
+                hero.critchance = 10
+                print("\nYou have maxed out this stat! We'll leave it at 10 and return any unused points.\n")
+                input("\nPress Enter to continue\n")
+            hero.statpoints -= (hero.critchance - crit_before)
+            print("\nDone!\n")
+            input("\nPress Enter to continue\n")
 
 def store(hero):
     while True:
