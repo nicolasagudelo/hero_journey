@@ -428,34 +428,46 @@ def boss(hero):
     global boss_defeat
     # We check the value for each key of the dictionary boss defeat and decide the boss to face depending on which one has not been defeated yet
     if boss_defeat[1] == False:
+        # If the hero is not level 10 yet then make the boss stronger to make the player train more before facing him.
         if hero.lvl < 10:
             leveldif = 11 - hero.lvl
         else:
             leveldif = 0
+        # We create the boss
         minion = spawnminion(hero.attack + leveldif ,hero.defense + leveldif, hero.speed + leveldif, hero.critchance + leveldif , hero.maxhealth + leveldif, 4)
         print("\nYou face the first general of the Demon King army: {name}, embrace yourself!\n".format(name = minion.name))
         combat = True
         while combat == True:
             try:
+                # We let the player know how much hp he has and how many potions he was at the beggining of this turn.
                 print(f'{"HP:":7}  {"{health}/{maxhealth}"}'.format(health = hero.health, maxhealth = hero.maxhealth))
                 print(f'{"Potions:":7}  {"{potions}"}'.format(potions = hero.potions))
+                # We ask the player if he wants to attack or drink a potion.
                 decision = int(input('\nIt\'s your turn {hero} what do you want to do?\n1. Attack\n2. Use potion\n'.format(hero = hero.name)))
                 match decision:
                     case 1:
                         clear()
-                        # If the player chooses 1 then we start the combat logic.
+                        # If the player chooses 1 then we start the combat by attacking the boss using the attack_enemy method.
                         combat = hero.attack_enemy(minion)
+                        # If the boss has any HP left the attack enemy function will return True in which case it's the boss' turn
                         if combat == True:
+                            # The minion attacks the player.
                             print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
                             combat = minion.attack_hero(hero)
+                        # If the boss does not have any HP left it means the player won the combat.
                         else:
                             boss_defeat[1] = True
+                            # Give the player experience for winning the combat.
                             hero.exp += 11
+                            # Give the player money for winning the combat.
                             hero.money += 10
+                            # Inform the player of how much money he has now.
                             print ("You got {money}$ now.\n".format(money = hero.money))
+                            # Reward the player with potions.
                             hero.potions += 3
                             if hero.potions > 10:
                                 hero.potions = 10
+                            # Check if the player leveled up and level him up.
                             if hero.exp >= 10:
                                 hero.level_up()
                             input("\nPress Enter to go back to the Village\n")
@@ -463,13 +475,15 @@ def boss(hero):
                     case 2:
                         clear()
                         # If the player choose to use a potion we call the use_potion method.
-                        potion_was_used = hero.use_potion() 
-                        if not potion_was_used: continue
+                        hero.use_potion() 
                     case _:
+                        # In case the player writes a number other than 1 or 2
                         print("Please type only 1 or 2 on your keyboard to choose an option.")
                         continue
             except ValueError:
+                # In case the player writes a value that is not a number
                 print("Sorry we didn't get that please try again.")
+        # If the player has no more hp left then leave the combat logic.
         if hero.health == 0: 
             clear()
             return 0
