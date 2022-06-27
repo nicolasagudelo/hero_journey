@@ -81,6 +81,7 @@ class Hero():
                                 combat = minion.attack_hero(self)
                             # If the minion does not have any HP left it means the player won the combat.
                             else:
+                                del minion
                                 # Increase the counter of how many monsters the player has killed.
                                 self.monsterskilled += 1
                                 # Give the player experience for winning the combat.
@@ -480,6 +481,7 @@ def boss(hero):
                         combat = minion.attack_hero(hero)
                     # If the boss does not have any HP left it means the player won the combat.
                     else:
+                        del minion
                         match boss_level:
                             case 4:
                                 # Change the status of wheter the boss has been defeated to True.
