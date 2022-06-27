@@ -5,11 +5,8 @@ from os import system
 from random import randint, random
 from time import sleep
 
-# Global Variables to keep track of the bosses that have been defeated. At the start none of them have been defeated hence we initialize the variables as False
-first_general_defeat = False
-second_general_defeat = False
-third_general_defeat = False
-final_boss_defeat = False
+# Global dictionary to keep track of the bosses that have been defeated. At the start none of them have been defeated hence we initialize all values to False
+boss_defeat = {1: False, 2: False, 3: False, 4: False}
 # Function to clean the windows command prompt to keep everything more organized.
 clear = lambda: system('cls')
 # List from where we will randomly get the name of the enemies the player will face while training.
@@ -80,6 +77,7 @@ class Hero():
                             if combat == True:
                                 # The minion attacks the player.
                                 print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
+                                # If the player has no more hp after the damage calculation then combat will be set to False and the Hero will be returned to the village.
                                 combat = minion.attack_hero(self)
                             # If the minion does not have any HP left it means the player won the combat.
                             else:
@@ -87,6 +85,8 @@ class Hero():
                                 self.monsterskilled += 1
                                 # Give the player experience for winning the combat.
                                 self.exp += 5
+                                # If the player is at his max level he won't get any more exp points.
+                                if self.lvl == 30: self.exp = 0
                                 # Give the player 1 to 3 $ for winning the combat.
                                 self.money += randint(1,3)
                                 # Tell the player how many money he has now
@@ -143,10 +143,12 @@ class Hero():
                 except ValueError: 
                     # In case the player writes a value that is not a number.
                     print("Sorry we didn't get that please try again.")
-
-    def level_up(self):        
-        while self.exp > 10:
+    # The level_up method will level up the player when he gets 10 or more exp and cap the mas level at level 30.
+    def level_up(self):
+        # While the player has more than 10 exp, increase the level by one current health by 3 max health by 5 and reduce exp by 10
+        while self.exp >= 10:
             self.lvl += 1
+            # If the player already reached level 30 he won't get any more levels or stats.
             if self.lvl > 30:
                 print("You have reached the maximum level you can get sir {hero}".format(hero = self.name))
                 self.lvl = 30
@@ -156,6 +158,7 @@ class Hero():
             self.maxhealth += 5
             self.exp -= 10
             self.statpoints += 1
+            # Let the player know he has leveled up.
             print ("\nYou leveled up sir {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\n\nYou have recovered 3 health points and have 5 more maximum health points.\n".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
             
     def use_potion(self):
@@ -173,52 +176,70 @@ class Hero():
                     self.potionsused += 1
                     return True
                     break
+        # If the player doesn't have potions, inform him about it and leave the method.
         else: print('You don\'t have any potions left.'); return False
 
     def gainhealth(self):
+        # Recover 20% of the maximum health.
         self.health += round(self.maxhealth * 0.2)
+        # If the amount of health was to exceed the amount of maximum health we make the current health equal to the maximum health.
         if self.health > self.maxhealth:
             self.health = self.maxhealth
+        # Let the player know the potion was used and how much HP he has now.
         print('You used a potion and have now {health}/{maxhealth} HP'.format(health = self.health, maxhealth = self.maxhealth))
     
     def attack_enemy(self, enemy):
+        # dodge will be set to True if the enemy dodged the attack or false if it did not.
         dodge = enemy.dodge()
+        # If he dodges no damage calculation is made.
         if dodge:
             print("\n{enemy} is too fast!, he dodged your attack.\n".format(enemy = enemy.name))
             return True
+        # If he did not dodge we make damage to the enemy
         else:
+            # crit method will return 1 or 2 randomly. the higher your critchange the higher the chance of getting a crit.
             crit = self.crit()
+            # If crit is equal to 2 the damage will be doubled.
             return (enemy.lose_health(round((self.maxhealth * 0.75 + self.attack) - (enemy.maxhealth * 0.5 + enemy.defense))*crit))
             
     
     def crit(self):
+        # At max critchance (10) the player will have a 50% chance of hitting a crit strike.
         if (random()*100 < self.critchance * 5):
+            # If the random number generated between 0 and 100 is lower than the players critchance then he lands a critical strike
             print("\nYou land a critical strike!\n")
             return 2
         return 1
     def dodge(self):
+        # At max speed (10) the player will have a 33% chance of dodging an enemy attack.
         if ((random()*100) < self.speed*3.3):
+            # If the random number generated between 0 and 100 is lower than the players speed then he dodges the enemy attack.
             return True
         return False
     def lose_health(self, damage):
+        # Added check so that negative damages are not possible. And you always lose at least 1 health.
         if damage <= 0:
             damage = 1
         print("\nYou take {damage} damage!\n".format(damage = damage))
+        # We reduce the amount of health of the player by the amount of damage taken.
         self.health -= damage
+        # We check that the health never goes lower than 0. If the health hits 0 then the player has been defeated. Take 25% of his money and all his potions. Return False to end the combat.
         if self.health <= 0:
             self.health = 0
+            # We inform the player that he has lost and will be transported back to the village with less money and no potions.
             print("\nYou have been defeated!\nYou will be transported back to the village and lose some money and your potions.")
             self.potions = 0
             self.money -= round(self.money * 0.25)
             input("\nPress Enter to continue\n")
             clear()
             return False
+        # If the player has HP remaining then let him know how much HP he has left and continue with the combat returnint True.
         else:
             print ("\nYou have {health}/{maxhealth} points remaining\n".format(health = self.health, maxhealth = self.maxhealth))
             return True
 
         
-
+# All the enemies in the game including the bosses are Minion objects. what changes about them is how their stats are calculated when using the spawnminion function.
 class Minion():
     def __init__(self, name, attack, defense, speed, critchance, health):
         self.name = name
@@ -230,40 +251,62 @@ class Minion():
         self.maxhealth = health
     def __repr__(self):
         return("This minion is a {name}, Attack: {attack}, Defense: {defense}, Speed: {speed}, CritChance = {critchance}, HP = {hp}, Max HP = {maxhp}".format(name = self.name, attack = self.attack, defense = self.defense, speed = self.speed, critchance = self.critchance, hp = self.health, maxhp = self.maxhealth))
+    # The dodge method will determine if the minion dodges or not the attack of the hero.
     def dodge(self):
         if ((random()*100) < self.speed*3.3):
             return True
         return False
+    # The lose_health method will carry out the damage calculation in case the minion has no hp after the damage calculation it will return False to finish the combat logic, otherwise it will return True to continue with the combat logic.
     def lose_health(self, damage):
+        # Adding a check so that negative damages are not possible and there is always at least 1 damage.
         if damage <= 0:
             damage = 1
         print("\n{minion} takes {damage} damage!\n".format(minion = self.name, damage = damage))
         self.health -= damage
+        # If the health was going to be lower than 0 set it to 0 instead.
         if self.health <= 0:
             self.health = 0
+            # Let the player know that the enemy has no hp and therefore has been defeated.
             print("\nYou have defeated {enemy}!\n".format(enemy = self.name))
             return False
         else:
+            # If the enemy still has HP after the damage calculation then let the player know how much HP the minion has and continue with the combat.
             print ("\n{enemy} has {health}/{maxhealth} HP remaining\n".format(enemy = self.name, health = self.health, maxhealth = self.maxhealth))
             return True
     def crit(self):
+        # If the random generated number is lower than the minions critchance then he lands a crit strike on the player.
         if (random()*100 < self.critchance * 5):
             print("\n{minion} lands a critical strike!\n".format(minion = self.name))
             return 2
         return 1
     def attack_hero(self, hero):
+        # Call the hero.dodge() method to check if the hero dodges the attack. If he does dodge will be set to True if not it will be set to False.
         dodge = hero.dodge()
         if dodge:
+            # If the player dodged the attack inform him about it.
             print("You dodged {enemy}'s attack!\n".format(enemy = self.name))
             return True
         else:
+            # If the player did not dodge continue with the damage calculation
+            # if the crit method returns 2 it means is a critical strike and damage will be doubled. if not it will return 1.
             crit = self.crit()
             return (hero.lose_health(round((self.maxhealth * 0.75 + self.attack) - (hero.maxhealth * 0.5 + hero.defense))*crit))
 
-
+# The spawnminion function will create minions for the player to fight against as the player progresses the enemies will be stronger.
 def spawnminion(attack, defense, speed, critchance, maxhealth, lvl):
+    # Depending of the lvl of the minion to be created we:
+    # - Select the monster name if it's not a boss from the minion list. for the bosses we have set fixed names.
+    # - Lower the stats of the monster for the minions so that the player is stronger than them.
+    # - This changes with the bosses. 
+    #   - The first boss will be 95% as strong as the player.
+    #   - The second boss will be as strong as the player.
+    #   - The third boss will be 5% stronger than the player.
+    #   - The last boss will be 10% stronger than the player.
+    # Also if the player has not trained enough (Doesn't have a set level against each boss then the bosses advantage will be even greater and in some cases virtually imposible to defeat until the player gets to that level.)
+    # This is calculated on the boss() function.
+    # Once this is defined a Minion object is created with the stats calculated to fight against the Hero.
     match lvl: 
-        case 1:    
+        case 1:
             index = randint(0,6)
             lower_stats = randint(75,80)
             percentage_lower_stats = lower_stats/100
@@ -291,13 +334,15 @@ def spawnminion(attack, defense, speed, critchance, maxhealth, lvl):
             percentage_lower_stats = 110/100
             return Minion('Lucifer', round(attack*percentage_lower_stats), round(defense*percentage_lower_stats), round(speed * percentage_lower_stats), round(critchance * percentage_lower_stats), round(maxhealth * percentage_lower_stats))
 
-def main():
+# Where the magic starts.
+def village():
     #Printing a welcome message for the player:
     welcome_message()
     clear()
     #We create our player:
     hero = create_player()
     clear()
+    # Explaining the menu to the player.
     print ("Welcome to the village {name} here you can choose between 4 different options".format(name = hero.name))
     print(f'{"Training":12}  ==>  {"This is how you level up and get money"}')
     print(f'{"Store":12}  ==>  {"Here you can get potions"}')
@@ -306,32 +351,47 @@ def main():
     input("Press Enter to continue")
     clear()
     while True:
+        # Whenever the hero returns to the village he recovers his health.
         hero.health = hero.maxhealth
+        # We check if the player has defeated all the bosses of the game with the game_over function.
         game_over(hero)
         try:
+            # Prompt the player on what he wants to do now.
             decision = int(input("Where do you want to go now Hero?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n5. Exit\n"))
             match decision:
                 case 1:
+                    # Take the player to fight minions.
                     hero.train()
                 case 2:
+                    # Take the player to the store where he can buy potions.
                     store(hero)
                     clear()
                 case 3:
+                    # Take the player to check his stats and spend stats points if he wants to.
                     stats(hero)
                 case 4:
+                    # Take the player to fight the bosses of the game.
                     boss(hero)
                     pass
                 case 5:
+                    # If the player decided to leave the game we thank him for playing and exit the program.
                     print("Thanks for playing!")
                     sleep(1)
                     clear()
                     exit()
+                case _:
+                    # If the player chooses anothe number print the menu again.
+                    clear()
         except ValueError:
+            # If the player writes something that is not a number then we show him this message.
             print("That is not a valid option try again.")
+            input("Press Enter to continue.")
+            clear()
 
 def game_over(hero):
-    global final_boss_defeat
-    if final_boss_defeat == True:
+    global boss_defeat
+    # If the final boss have been defeated the value of the dictionary for key 4 will be set to True in which case we proceed to congratulate the player and end the game creating a file with his final stats and opening a link to "We are the champions" song on Youtube.
+    if boss_defeat[4] == True:
         try:
             with open('winner.txt', 'w') as f:
                 f.write ("Congratulations {name}\n\nThis txt was created as proof of you finishing the game!\nYour final stats:\n\nAttack: {attack}\nDefense: {defense}\nSpeed: {speed}\nCrit Chance: {critchance}\nMonsters defeated: {monsters}\nPotions used: {potions}".format(name = hero.name, attack = hero.attack, defense = hero.defense, speed = hero.speed, critchance = hero.critchance, monsters = hero.monsterskilled, potions = hero.potionsused))
@@ -363,10 +423,11 @@ def game_over(hero):
         system('start https://youtu.be/ym_jVTcBxSU')
         exit()
 
-
+# If the player chooses the boss function will execute.
 def boss(hero):
-    global first_general_defeat, second_general_defeat, third_general_defeat, final_boss_defeat
-    if first_general_defeat == False:
+    global boss_defeat
+    # We check the value for each key of the dictionary boss defeat and decide the boss to face depending on which one has not been defeated yet
+    if boss_defeat[1] == False:
         if hero.lvl < 10:
             leveldif = 11 - hero.lvl
         else:
@@ -388,7 +449,7 @@ def boss(hero):
                             print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
                             combat = minion.attack_hero(hero)
                         else:
-                            first_general_defeat = True
+                            boss_defeat[1] = True
                             hero.exp += 11
                             hero.money += 10
                             print ("You got {money}$ now.\n".format(money = hero.money))
@@ -412,7 +473,7 @@ def boss(hero):
         if hero.health == 0: 
             clear()
             return 0
-    elif second_general_defeat == False:
+    elif boss_defeat[2] == False:
         if hero.lvl < 20:
             leveldif = 21 - hero.lvl
         else:
@@ -434,7 +495,7 @@ def boss(hero):
                             print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
                             combat = minion.attack_hero(hero)
                         else:
-                            second_general_defeat = True
+                            boss_defeat[2] = True
                             hero.exp += 21
                             hero.money += 10
                             print ("You got {money}$ now.\n".format(money = hero.money))
@@ -456,7 +517,7 @@ def boss(hero):
             except ValueError:
                 print("Sorry we didn't get that please try again.")
         if hero.health == 0: return 0
-    elif third_general_defeat == False:
+    elif boss_defeat[3] == False:
         if hero.lvl < 30:
             leveldif = 30 - hero.lvl
         else:
@@ -478,7 +539,7 @@ def boss(hero):
                             print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
                             combat = minion.attack_hero(hero)
                         else:
-                            third_general_defeat = True
+                            boss_defeat[3] = True
                             hero.exp += 31
                             hero.money += 10
                             print ("You got {money}$ now.\n".format(money = hero.money))
@@ -500,7 +561,7 @@ def boss(hero):
             except ValueError:
                 print("Sorry we didn't get that please try again.")
         if hero.health == 0: return 0
-    elif final_boss_defeat == False:
+    elif boss_defeat[4] == False:
         if hero.lvl < 30:
             leveldif = 41 - hero.lvl
         else:
@@ -522,7 +583,7 @@ def boss(hero):
                             print("\nCarefull {enemy} is attacking now!\n".format(enemy = minion.name))
                             combat = minion.attack_hero(hero)
                         else:
-                            final_boss_defeat = True
+                            boss_defeat[4] = True
                             hero.exp += 41
                             hero.money += 10
                             print ("You got {money}$ now.\n".format(money = hero.money))
@@ -913,6 +974,6 @@ U  \ V  V /  U|_____|  |_____|  \____|\_)-\___/  |_|  |_|  |_____|
 
     input("Press Enter to continue:")    
 
-main()
+village()
 
     
