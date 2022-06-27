@@ -132,7 +132,7 @@ class Hero():
                         # If the player selects to go back to the village set keep_fighting as False and break the current loop as a decision was made.
                             keep_fighting = False
                             clear()
-                            print("Gotcha!, going back to the village now.", flush= True)
+                            print("Going back to the village now.", flush= True)
                             input("Press Enter to continue.")
                             clear()
                             break
@@ -451,6 +451,7 @@ def boss(hero):
         # We create the boss
     minion = spawnminion(hero.attack + leveldif ,hero.defense + leveldif, hero.speed + leveldif, hero.critchance + leveldif , hero.maxhealth + leveldif, boss_level)
     match boss_level:
+        # We print the boss name according to the level the player is facing.
         case 4:
             print("\nYou face the first general of the Demon King army: {name}, embrace yourself!\n".format(name = minion.name))
         case 5:
@@ -462,7 +463,7 @@ def boss(hero):
     combat = True
     while combat == True:
         try:
-            # We let the player know how much hp he has and how many potions he was at the beggining of this turn.
+            # We let the player know how much HP he has and how many potions he was at the beggining of this turn.
             print(f'{"HP:":7}  {"{health}/{maxhealth}"}'.format(health = hero.health, maxhealth = hero.maxhealth))
             print(f'{"Potions:":7}  {"{potions}"}'.format(potions = hero.potions))
             # We ask the player if he wants to attack or drink a potion.
@@ -481,29 +482,39 @@ def boss(hero):
                     else:
                         match boss_level:
                             case 4:
+                                # Change the status of wheter the boss has been defeated to True.
                                 boss_defeat[1] = True
                                 # Give the player experience for winning the combat.
                                 hero.exp += 11
                                 # Give the player money for winning the combat.
                                 hero.money += 10
                             case 5:
+                                # Change the status of wheter the boss has been defeated to True.
                                 boss_defeat[2] = True
+                                # Give the player experience for winning the combat.
                                 hero.exp += 21
+                                # Give the player money for winning the combat.
                                 hero.money += 15
                             case 6:
+                                # Change the status of wheter the boss has been defeated to True.
                                 boss_defeat[3] = True
+                                # Give the player experience for winning the combat.
                                 hero.exp += 31
+                                # Give the player money for winning the combat.
                                 hero.money += 20
                             case 7:
+                                # Change the status of wheter the boss has been defeated to True.
                                 boss_defeat[4] = True
+                                # Give the player experience for winning the combat.
                                 hero.exp += 41
                         # Reward the player with potions.
                         hero.potions += 3
                         # Inform the player of how much money he has now.
                         print ("You got {money}$ now.\n".format(money = hero.money))
+                        # If the player gets more than 10 potions then set the number of potions to 10
                         if hero.potions > 10:
                             hero.potions = 10
-                        # Check if the player leveled up and level him up.
+                        # Check if the player leveled up and level him up using the level_up method.
                         if hero.exp >= 10:
                             hero.level_up()
                         input("\nPress Enter to go back to the Village\n")
@@ -524,31 +535,40 @@ def boss(hero):
         clear()
         return 0
 
+# The stats function will show the player his stats and let him upgrade them if he wants to and if he has stat points available.
 def stats(hero):
     clear()
+    # Print the current stats of the hero.
     print(hero)
+    # If the player doesn't have any stat points then take him back to the village after showing him his current stats.
     if hero.statpoints == 0:
         print("\nYou don't have any statpoints to spend right now.\n")
         input("Press Enter to return to the village.")
         clear()
+    # If not then show him how many stat points he has.
     else:
         while True:
             try:
+                # Ask the player if he wants to spend his stats points now.
                 answer = input("You have {statpoints} statpoints available to use.\nDo you want to spend them now? Y/N\n".format(statpoints = hero.statpoints)).upper().strip()
                 match answer:
                     case 'Y':
+                        # If the player answer Y then call the assign_stats function.
                         assign_stats(hero)
                         break
                     case 'N':
+                        # If the player answern N then leave the loop.
                         clear()
                         break
-                    # In case they write anything else.
+                    # In case they write anything else. we continue asking until they answer Y or N
                     case _: 
                         print("Please type Y for yes, or, N for no. Other answers are not supported.") 
                         continue
             except ValueError:
+                # In case the player types anything that the interpreter considers a value error.
                 print("\nWe didn't get that, please try again.")
-    
+
+# The assign_stats function will ask the player which stat he wants to update in case he can it will do it.
 def assign_stats(hero):
     while True:
         clear()
@@ -558,83 +578,110 @@ def assign_stats(hero):
         print(f'{"Speed":12}  ==>  {hero.speed:3d}')
         print(f'{"Crit. Chance":12}  ==>  {hero.critchance:3d}')
         try:
+            # We get the attribute that the player wants to upgrade.
             attribute = int(input("Select the attribute you want to upgrade:\n1. Attack\n2. Defense\n3. Speed\n4. Crit Chance\n5. Go back to the Village\n"))
+            # Depending on the attribute that the player chooses different portion of the code is executed.
             match attribute:
                 case 1:
+                    # In case the player selects attack, check that the attribute is not at it's max level.
                     if hero.attack == 10:
+                        # If it is let the player know he can't upgrade this attribute anymore.
                         print("\nYou have already maxed out this stat, please choose another one.\n")
                         input("\nPress Enter to continue\n")
                         continue
                     try:
+                        # If not ask how many stat points he wants to invest in this attribute.
                         upgrade_stats = int(input("How many points do you want to spend increasing your attack stats?\n"))
+                        # If he writes a number bigger than the amount of points he has then let him know he doesn't have that amount of stat points available.
                         if upgrade_stats > hero.statpoints:
                             print("\nYou don't have that many stat points please try again.\n")
                             input("\nPress Enter to continue\n")
                             continue
+                        # If he has the amount of points then increase the stats of the player on the selected attribute.
                         increase_stats(upgrade_stats, attribute, hero)
                     except ValueError:
                         print("\nWe didn't get that, please try again.\n")
                         input("\nPress Enter to continue\n")
                 case 2:
+                    # In case the player selects defense, check that the attribute is not at it's max level.
                     if hero.defense == 10:
+                        # If it is let the player know he can't upgrade this attribute anymore.
                         print("\nYou have already maxed out this stat, please choose another one.\n")
                         input("\nPress Enter to continue\n")
                         continue
                     try:
+                        # If not ask how many stat points he wants to invest in this attribute.
                         upgrade_stats = int(input("How many points do you want to spend increasing your defense stats?\n"))
+                        # If he writes a number bigger than the amount of points he has then let him know he doesn't have that amount of stat points available.
                         if upgrade_stats > hero.statpoints:
                             print("\nYou don't have that many stat points please try again.\n")
                             input("\nPress Enter to continue\n")
                             continue
+                        # If he has the amount of points then increase the stats of the player on the selected attribute.
                         increase_stats(upgrade_stats, attribute, hero)
                     except ValueError:
                         print("\nWe didn't get that, please try again.\n")
                         input("\nPress Enter to continue\n")
                 case 3:
+                    # In case the player selects speed, check that the attribute is not at it's max level.
                     if hero.speed == 10:
+                        # If it is let the player know he can't upgrade this attribute anymore.
                         print("\nYou have already maxed out this stat, please choose another one.\n")
                         input("\nPress Enter to continue\n")
                         continue
                     try:
+                        # If not ask how many stat points he wants to invest in this attribute.
                         upgrade_stats = int(input("How many points do you want to spend increasing your speed stats?\n"))
+                        # If he writes a number bigger than the amount of points he has then let him know he doesn't have that amount of stat points available.
                         if upgrade_stats > hero.statpoints:
                             print("\nYou don't have that many stat points please try again.\n")
                             input("\nPress Enter to continue\n")
                             continue
+                        # If he has the amount of points then increase the stats of the player on the selected attribute.
                         increase_stats(upgrade_stats, attribute, hero)
                     except ValueError:
                         print("\nWe didn't get that, please try again.\n")
                         input("\nPress Enter to continue\n")
                 case 4:
+                    # In case the player selects crit chance, check that the attribute is not at it's max level.
                     if hero.critchance == 10:
+                        # If it is let the player know he can't upgrade this attribute anymore.
                         print("You have already maxed out this stat, please choose another one.")
                         input("\nPress Enter to continue\n")
                         continue
                     try:
+                        # If not ask how many stat points he wants to invest in this attribute.
                         upgrade_stats = int(input("How many points do you want to spend increasing your crit chance stats?\n"))
+                        # If he writes a number bigger than the amount of points he has then let him know he doesn't have that amount of stat points available.
                         if upgrade_stats > hero.statpoints:
                             print("\nYou don't have that many stat points please try again.\n")
                             input("\nPress Enter to continue\n")
                             continue
+                        # If he has the amount of points then increase the stats of the player on the selected attribute.
                         increase_stats(upgrade_stats, attribute, hero)
                     except ValueError:
                         print("\nWe didn't get that, please try again.\n")
                         input("\nPress Enter to continue\n")
                 case 5:
+                    # Take the player back to the village if he chooses to.
                     print("Going back to the Village!",flush=True)
-                    sleep(1.5)
+                    input('Press Enter to continue')
                     clear()
                     break
                 case _:
+                    # In case the player selects a not supported number.
                     print("\nNot a valid option, please try again.\n")
                     input("\nPress Enter to continue\n")
                     continue
             
         except ValueError:
+            # In case the player writes something that is not a number.
             print("\nWe didn't get that, please try again.")
             input("\nPress Enter to continue\n")
 
 def increase_stats(points, attribute,hero):
+    # Depending on the selected attribute increase the stat by the selected amount
+    # If the amount was to surpass 10 which is the max level for each attribute then set the attribute to 10 and return any unused points so that the player can assign them to other attribute.
     match attribute:
         case 1:
             attack_before = hero.attack
@@ -677,14 +724,17 @@ def increase_stats(points, attribute,hero):
             print("\nDone!\n")
             input("\nPress Enter to continue\n")
 
+# The store function is used so that the player can spend his money in potions.
 def store(hero):
     while True:
         clear()
+        # Greet the player and let him know the price of the potions.
         print ("Welcome to the store {name} here you can buy potions for your adventures\n".format(name = hero.name))
         print (f'{"Item:":6}    {"Price:"}')
         print (f'{"Potion":6}    {"5$"}')
         try:
-            potions_to_buy = int(input("\nYou have {potions} potions and {money}$, how many potions would you like to buy?\nWrite 0 if you want to go back to the village\n".format(potions = hero.potions, money = hero.money)))
+            # Ask the player how many potions he wants to buy
+            potions_to_buy = int(input("\nYou have {potions} potions and {money}$, how many potions would you like to buy?\n\nWrite 0 if you want to go back to the village\n".format(potions = hero.potions, money = hero.money)))
             # If the player writes 0 we take him back to the village
             if potions_to_buy == 0:
                 print("\nWe hope to have you back soon!")
@@ -694,10 +744,12 @@ def store(hero):
             if potions_to_buy > 10: potions_to_buy = 10; print("\nYou can't carry more than 10 potions we will assume you want 10 potions\n")
             # If the player set an amount that is going to go over 10 potions we max out his number of potions to 10 instead without making him pay extra money.
             if hero.potions + potions_to_buy > 10: potions_to_buy = potions_to_buy - hero.potions; print("\nYou don't have space on your inventory for that amount of potions, we will max out your potions to 10.\n")
+            # Check wheter the player has enough money to buy the requested potions.
             if (potions_to_buy * 5) > hero.money:
                 print("\nYou don't have enough money to buy that many potions, please select a lower number.\n")
                 input("Press Enter to go back to the Store.\n")
                 continue
+            # If the player has enough money then increase the amount of potions he has by the number he bought and reduce the money he has by the money he spent.
             else:
                 hero.potions += potions_to_buy
                 hero.money -= potions_to_buy * 5
@@ -708,6 +760,7 @@ def store(hero):
             print("\nThe value you wrote is not valid, please try again.\n")
             input("Press Enter to go back to the Store.\n")
 
+# The create_player function will return a Hero object which will be the one ultimately controlled by the player.
 def create_player():
     print("""
 You will now start your adventure to defeat the Demon King and his three generals, they have started a war against humanity and seek to exterminate them. 
@@ -743,7 +796,7 @@ You will have to train, face enemies, level up and gather resources before takin
     clear()
     print("Sir {name} then, the outcome of your battles and how well you prepare yourself to face this challenge will forever change the destiny of humanity and the world.\n".format(name = name))
     input("Press Enter to continue")
-     
+    # Initial stat points. 
     stat_points = 10
     clear()
     print("""
@@ -818,6 +871,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
             print("Please use only numbers to select your stats\n")
             input("Press Enter to continue")
         clear()
+        # Show the player the results of what he chose and ask him if he wants to keep it like that.
         print("This is how everything looks:\n")
         print(f'{"Attack":12}  ==>  {attack_points:3d}')
         print(f'{"Defense":12}  ==>  {defense_points:3d}')
@@ -827,7 +881,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
             answer = input("Confirm if this is okay \n(Type Y for yes, or, N for no)\n".format(name = name)).upper().strip()
             match answer:
                 case 'Y': break
-                # If not we keep asking the player for their name.
+                # If not we repeat the attributes to 0 and ask the player again how he will like to distribute his initial stat points.
                 case 'N': 
                     print("Let\'s try that again shall we?\n")
                     input("Press Enter to continue")
@@ -844,7 +898,8 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
 
     # Create player once we have all his information collected:
     return(Hero(name, attack_points, defense_points, speed_points, crit_points, stat_points))
-    
+
+# Message shown at the beginning of the game.
 def welcome_message():
     print ("""
     
@@ -892,6 +947,7 @@ U  \ V  V /  U|_____|  |_____|  \____|\_)-\___/  |_|  |_|  |_____|
 
     input("Press Enter to continue:")    
 
+# Start the game
 village()
 
     
