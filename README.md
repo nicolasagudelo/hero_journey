@@ -166,6 +166,6 @@ You can also download the executable on this [link](https://github.com/nicolasag
 
 <hr>
 
-Feel free to contact me through my email (public on my profile) if you find any issue or problem with the game or if you have any advise about how something might be better implemented. You can also to try adding more stuff to the game I would love to see that.
+Feel free to contact me through my email (public on my profile) if you find any issue or problem with the game or if you have any advice about how something might be better implemented. You can also try adding more stuff to the game I would love to see that.
 
 Thanks.
