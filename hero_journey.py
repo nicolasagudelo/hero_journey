@@ -151,7 +151,7 @@ class Hero():
             self.lvl += 1
             # If the player already reached level 30 he won't get any more levels or stats.
             if self.lvl > 30:
-                print("You have reached the maximum level you can get sir {hero}".format(hero = self.name))
+                print("You have reached the maximum level you can get {hero}".format(hero = self.name))
                 self.lvl = 30
                 self.exp = 0
                 return 0
@@ -160,7 +160,7 @@ class Hero():
             self.exp -= 10
             self.statpoints += 1
             # Let the player know he has leveled up.
-            print ("\nYou leveled up sir {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\n\nYou have recovered 3 health points and have 5 more maximum health points.\n".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
+            print ("\nYou leveled up {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\n\nYou have recovered 3 health points and have 5 more maximum health points.\n".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
             
     def use_potion(self):
         # Uses a potion on the hero to recover 20% of his health. (If he has potions left.)
@@ -358,7 +358,7 @@ def village():
         game_over(hero)
         try:
             # Prompt the player on what he wants to do now.
-            decision = int(input("Where do you want to go now Hero?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n5. Exit\n"))
+            decision = int(input("Where do you want to go now {hero}}?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n5. Exit\n".format(hero = hero.name)))
             match decision:
                 case 1:
                     # Take the player to fight minions.
@@ -773,11 +773,11 @@ You will have to train, face enemies, level up and gather resources before takin
     while True:
         clear()
         # Prompt the player for their name
-        name = input("Let\'s start by getting your name sir Hero.\nPlease type your name:\n")
+        name = input("Let\'s start by getting your name.\nPlease type your name:\n")
         try:
             # We confirm with the player whether the name they wrote is right or not.
             clear()
-            answer = input("The name you wrote is {name}. Is this the correct name Hero? \n(Type Y for yes, or, N for no)\n".format(name = name)).upper().strip()
+            answer = input("The name you wrote is {name}. Is this the correct name? \n(Type Y for yes, or, N for no)\n".format(name = name)).upper().strip()
             match answer:
                 case 'Y': break
                 # If not we keep asking the player for their name.
@@ -796,7 +796,7 @@ You will have to train, face enemies, level up and gather resources before takin
             input("Press Enter to continue")
             continue
     clear()
-    print("Sir {name} then, the outcome of your battles and how well you prepare yourself to face this challenge will forever change the destiny of humanity and the world.\n".format(name = name))
+    print("{name} then, the outcome of your battles and how well you prepare yourself to face this challenge will forever change the destiny of humanity and the world.\n".format(name = name))
     input("Press Enter to continue")
     # Initial stat points. 
     stat_points = 10
@@ -824,7 +824,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
                 attack_points = int(input("Write the number of points you wish to invest towards ATTACK.\n"))
                 # We check that the amount written is valid, if it is we reduce the total amount of points remaining.
                 if attack_points > stat_points:
-                    print("Calm down sir {name} you don't have that many points yet\n".format(name = name))
+                    print("Calm down {name} you don't have that many points yet\n".format(name = name))
                     input("Press Enter to continue")
                     continue
                 else:
@@ -837,7 +837,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
                 defense_points = int(input("Write the number of points you wish to invest towards DEFENSE.\n"))
                 # We check that the amount written is valid, if it is we reduce the total amount of points remaining.
                 if defense_points > stat_points:
-                    print("Calm down sir {name} you don't have that many points yet\n".format(name = name))
+                    print("Calm down {name} you don't have that many points yet\n".format(name = name))
                     input("Press Enter to continue")
                     continue
                 else:
@@ -850,7 +850,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
                 speed_points = int(input("Write the number of points you wish to invest towards SPEED.\n"))
                 # We check that the amount written is valid, if it is we reduce the total amount of points remaining.
                 if speed_points > stat_points:
-                    print("Calm down sir {name} you don't have that many points yet\n".format(name = name))
+                    print("Calm down {name} you don't have that many points yet\n".format(name = name))
                     input("Press Enter to continue")
                     continue
                 else:
@@ -863,7 +863,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
                 crit_points = int(input("Write the number of points you wish to invest towards CRIT CHANCE.\n"))
                 # We check that the amount written is valid, if it is we reduce the total amount of points remaining.
                 if crit_points > stat_points:
-                    print("Calm down sir {name} you don't have that many points yet\n".format(name = name))
+                    print("Calm down {name} you don't have that many points yet\n".format(name = name))
                     input("Press Enter to continue")
                     continue
                 else:
@@ -894,7 +894,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
                     continue
         if answer == 'N': continue
         clear()
-        print("Thanks Hero, your adventure will now start, your will be transported to the village where you will be able to choose what to do next. if you have any unused stat points left you will be able to use them there too.\nI wish you the best of luck in your journey!")
+        print("Thanks {hero}, your adventure will now start, your will be transported to the village where you will be able to choose what to do next. if you have any unused stat points left you will be able to use them there too.\nI wish you the best of luck in your journey!".format(name = name))
         input('Press Enter to continue')
         break
 
