@@ -156,10 +156,9 @@ The combat mechanics against the bosses are the same as with the minions; howeve
 
 <hr>
 
-To install the game go into the <strong>releases</strong> section from [this repository](https://github.com/nicolasagudelo/hero_journey) at github.
+You can find the code for the game at [this repository](https://github.com/nicolasagudelo/hero_journey) at github.
 
-Then at the very end of the releases page under the Assets section choose the file <strong>hero_journey.zip</strong> to download the game. After that you can unzip the file and execute the executable file inside <strong>hero_journey.exe</strong> to play the game.
-
+You can also download the executable on this [link](https://github.com/nicolasagudelo/hero_journey/releases/download/v1.0/hero_journey.zip)
 
 <hr>
 
