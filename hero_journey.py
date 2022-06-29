@@ -358,7 +358,7 @@ def village():
         game_over(hero)
         try:
             # Prompt the player on what he wants to do now.
-            decision = int(input("Where do you want to go now {hero}}?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n5. Exit\n".format(hero = hero.name)))
+            decision = int(input("Where do you want to go now {hero}?\n1. Training grounds\n2. Store\n3. Check my stat points\n4. Battle Boss\n5. Exit\n".format(hero = hero.name)))
             match decision:
                 case 1:
                     # Take the player to fight minions.
@@ -386,7 +386,6 @@ def village():
         except ValueError:
             # If the player writes something that is not a number then we show him this message.
             print("That is not a valid option try again.")
-            input("Press Enter to continue.")
             clear()
 
 def game_over(hero):
@@ -894,7 +893,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
                     continue
         if answer == 'N': continue
         clear()
-        print("Thanks {hero}, your adventure will now start, your will be transported to the village where you will be able to choose what to do next. if you have any unused stat points left you will be able to use them there too.\nI wish you the best of luck in your journey!".format(name = name))
+        print("Thanks {hero}, your adventure will now start, your will be transported to the village where you will be able to choose what to do next. if you have any unused stat points left you will be able to use them there too.\nI wish you the best of luck in your journey!".format(hero = name))
         input('Press Enter to continue')
         break
 
