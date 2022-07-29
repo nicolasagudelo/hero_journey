@@ -1,14 +1,21 @@
 #Author: Nicolas Agudelo.
 
 # Import the modules that will be used for the game.
-from os import system
+from os import system, name
 from random import randint, random
 from time import sleep
+
 
 # Global dictionary to keep track of the bosses that have been defeated. At the start none of them have been defeated hence we initialize all values to False
 boss_defeat = {1: False, 2: False, 3: False, 4: False}
 # Function to clean the windows command prompt to keep everything more organized.
-clear = lambda: system('cls')
+def clear():
+    if name == 'nt':
+        system('cls')
+    else:
+        system('clear')
+
+
 # List from where we will randomly get the name of the enemies the player will face while training.
 minion_list = ['Slime', 'Wolf', 'Undead', 'Goblin', 'Bandit', 'Zombie', 'Ghoul', 
                 'Orc', 'Dark Knight', 'Gremlin', 'Werewolf', 'Golem', 'Witch', 'Valkyrie',
@@ -29,8 +36,8 @@ class Hero():
         self.money = 0
         self.potions = 0
         self.monsterskilled = 0
-        self.potionsused = 0        
-    
+        self.potionsused = 0
+
     # Using the __repr__ function so that the player can check his current stats.
     def __repr__(self):
         print("You are the Hero {name}.".format(name = self.name))
@@ -105,8 +112,8 @@ class Hero():
                                 # When the player hits 10 exp we will get a new level and reset his exp. The level_up method manages this.
                                 if self.exp >= 10:
                                     self.level_up()
-                                    
-                        case 2: 
+
+                        case 2:
                             clear()
                             # If the player choose to use a potion we call the use_potion method.
                             self.use_potion()
@@ -141,7 +148,7 @@ class Hero():
                         # In case the player writes a number other than 1 or 2.
                             print("Please type only 1 or 2 on your keyboard to choose an option.")
                             continue
-                except ValueError: 
+                except ValueError:
                     # In case the player writes a value that is not a number.
                     print("Sorry we didn't get that please try again.")
     # The level_up method will level up the player when he gets 10 or more exp and cap the mas level at level 30.
@@ -161,7 +168,7 @@ class Hero():
             self.statpoints += 1
             # Let the player know he has leveled up.
             print ("\nYou leveled up {hero}! you are now level {lvl} and have {statpoints} stat points available to use when you go back to the village\n\nYou have recovered 3 health points and have 5 more maximum health points.\n".format(hero = self.name, lvl = self.lvl, statpoints = self.statpoints))
-            
+
     def use_potion(self):
         # Uses a potion on the hero to recover 20% of his health. (If he has potions left.)
         if self.potions > 0:
@@ -188,7 +195,7 @@ class Hero():
             self.health = self.maxhealth
         # Let the player know the potion was used and how much HP he has now.
         print('You used a potion and have now {health}/{maxhealth} HP'.format(health = self.health, maxhealth = self.maxhealth))
-    
+
     def attack_enemy(self, enemy):
         # dodge will be set to True if the enemy dodged the attack or false if it did not.
         dodge = enemy.dodge()
@@ -202,8 +209,7 @@ class Hero():
             crit = self.crit()
             # If crit is equal to 2 the damage will be doubled.
             return (enemy.lose_health(round((self.maxhealth * 0.75 + self.attack) - (enemy.maxhealth * 0.5 + enemy.defense))*crit))
-            
-    
+
     def crit(self):
         # At max critchance (10) the player will have a 50% chance of hitting a crit strike.
         if (random()*100 < self.critchance * 5):
@@ -239,7 +245,6 @@ class Hero():
             print ("\nYou have {health}/{maxhealth} points remaining\n".format(health = self.health, maxhealth = self.maxhealth))
             return True
 
-        
 # All the enemies in the game including the bosses are Minion objects. what changes about them is how their stats are calculated when using the spawnminion function.
 class Minion():
     def __init__(self, name, attack, defense, speed, critchance, health):
@@ -298,7 +303,7 @@ def spawnminion(attack, defense, speed, critchance, maxhealth, lvl):
     # Depending of the lvl of the minion to be created we:
     # - Select the monster name if it's not a boss from the minion list. for the bosses we have set fixed names.
     # - Lower the stats of the monster for the minions so that the player is stronger than them.
-    # - This changes with the bosses. 
+    # - This changes with the bosses.
     #   - The first boss will be 95% as strong as the player.
     #   - The second boss will be as strong as the player.
     #   - The third boss will be 5% stronger than the player.
@@ -306,7 +311,7 @@ def spawnminion(attack, defense, speed, critchance, maxhealth, lvl):
     # Also if the player has not trained enough (Doesn't have a set level against each boss then the bosses advantage will be even greater and in some cases virtually imposible to defeat until the player gets to that level.)
     # This is calculated on the boss() function.
     # Once this is defined a Minion object is created with the stats calculated to fight against the Hero.
-    match lvl: 
+    match lvl:
         case 1:
             index = randint(0,6)
             lower_stats = randint(75,80)
@@ -674,7 +679,7 @@ def assign_stats(hero):
                     print("\nNot a valid option, please try again.\n")
                     input("\nPress Enter to continue\n")
                     continue
-            
+
         except ValueError:
             # In case the player writes something that is not a number.
             print("\nWe didn't get that, please try again.")
@@ -883,7 +888,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
             match answer:
                 case 'Y': break
                 # If not we repeat the attributes to 0 and ask the player again how he will like to distribute his initial stat points.
-                case 'N': 
+                case 'N':
                     print("Let\'s try that again shall we?\n")
                     input("Press Enter to continue")
                     break
@@ -903,7 +908,7 @@ Now is the time to distribute your initial stats you will receive {stat_points} 
 # Message shown at the beginning of the game.
 def welcome_message():
     print ("""
-    
+
              U _____ u  _        ____   U  ___ u  __  __  U _____ u 
  __        __\| ___"|/ |"|    U /"___|   \/"_ \/U|' \/ '|u\| ___"|/ 
  \\"\      /"/ |  _|" U | | u  \| | u     | | | |\| |\/| |/ |  _|"   
@@ -950,5 +955,3 @@ U  \ V  V /  U|_____|  |_____|  \____|\_)-\___/  |_|  |_|  |_____|
 
 # Start the game
 village()
-
-    
